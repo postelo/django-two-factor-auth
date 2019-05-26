@@ -55,6 +55,10 @@ def key_validator(*args, **kwargs):
     return hex_validator()(*args, **kwargs)
 
 
+def random_hex_str():
+    return random_hex().decode('utf-8')
+
+
 class PhoneDevice(Device):
     """
     Model with phone number and token seed linked to a user.
@@ -65,7 +69,7 @@ class PhoneDevice(Device):
     number = PhoneNumberField()
     key = models.CharField(max_length=40,
                            validators=[key_validator],
-                           default=random_hex,
+                           default=random_hex_str,
                            help_text="Hex-encoded secret key")
     method = models.CharField(max_length=4, choices=PHONE_METHODS,
                               verbose_name=_('method'))
@@ -75,13 +79,6 @@ class PhoneDevice(Device):
             self.number,
             self.method,
         )
-
-    def __eq__(self, other):
-        if not isinstance(other, PhoneDevice):
-            return False
-        return self.number == other.number \
-            and self.method == other.method \
-            and self.key == other.key
 
     @property
     def bin_key(self):
